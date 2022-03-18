@@ -14,10 +14,10 @@ export const Body = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   border: 1px solid black;
   background-color: white;
-  opacity: 0.7;
+  opacity: 0.68;
   position: absolute;
   h2 {
     font-weight: bold;
