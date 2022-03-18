@@ -9,7 +9,16 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  writeBatch,
+  query,
+  getDocs,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC7-3Ssmd9bKD8F8yNFFTOJJ65Fkmq8Vsw",
@@ -17,7 +26,7 @@ const firebaseConfig = {
   projectId: "e-commerce-template-db",
   storageBucket: "e-commerce-template-db.appspot.com",
   messagingSenderId: "966011382252",
-  appId: "1:966011382252:web:4907ad014a6e991935f8c9"
+  appId: "1:966011382252:web:4907ad014a6e991935f8c9",
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -36,6 +45,35 @@ export const signInWithGoogleRedirect = () =>
   signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
+
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = collection(db, collectionKey);
+  const batch = writeBatch(db);
+
+  objectsToAdd.forEach((object) => {
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    batch.set(docRef, object);
+  });
+  await batch.commit();
+  console.log("done");
+};
+
+// get categoryMap from firestore db
+export const getCategoriesAndDocuments = async () => {
+  const collectionRef = collection(db, "categories");
+  const q = query(collectionRef);
+
+  const querySnapshot = await getDocs(q);
+  const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+    const { title, items } = docSnapshot.data();
+    acc[title.toLowerCase()] = items;
+    return acc;
+  }, {});
+  return categoryMap;
+};
 
 export const createUserDocumentFromAuth = async (
   userAuth,
